@@ -1,3 +1,29 @@
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
+from tethys_apps.app_installation import find_resource_files
 
-setup()
+# -- Apps Definition -- #
+app_package = 'django_param'
+release_package = app_package
+
+# -- Python Dependencies -- #
+dependencies = []
+
+# -- Get Resource File -- #
+resource_files = find_resource_files(app_package, app_package)
+
+setup(
+    name=release_package,
+    version='0.0.1',
+    description='',
+    long_description='',
+    keywords='',
+    author='Aquaveo',
+    author_email='',
+    url='',
+    license='',
+    packages=find_namespace_packages(),
+    package_data={'': resource_files},
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=dependencies,
+)
