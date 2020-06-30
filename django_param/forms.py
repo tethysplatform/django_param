@@ -1,17 +1,24 @@
-from django.forms import Form
+from django import forms
 import param
 from .widget_map import widget_map
 
 
-class ParamForm(Form):
+class ParamForm(forms.Form):
     _param = None
     form_field_prefix = None
     read_only = None
+    _error_key_list = []
 
-    def __init__(self, p=None, *args, **kwargs):
-        if not isinstance(p, param.Parameterized):
-            raise ValueError
-        self._param = p
+    def __init__(self, *args, **kwargs):
+        param_class = kwargs.pop('param_class', None)
+        read_only = kwargs.pop('read_only', None)
+        if param_class is None:
+            raise KeyError('Keyword argument param_class is required')
+        if not isinstance(param_class, param.Parameterized):
+            raise ValueError(f'{param_class} must be an instance of param.Parameterized')
+        self._param = param_class
+        if read_only:
+            self.read_only = read_only
         super().__init__(*args, **kwargs)
         self._generate_form_fields()
 
@@ -19,14 +26,23 @@ class ParamForm(Form):
     def param(self):
         return self._param
 
-    def _generate_form_fields(self, set_options=None):
+    def _add_error(self, key, message):
+        # Only add error once for each parameter to avoid duplicate
+        if key not in self._error_key_list:
+            self._error_key_list.append(key)
+            self.add_error(key, str(message))
+
+    def _set_and_validate_data(self, data):
+        for key, value in data.items():
+            try:
+                self.param.set_param(key, value)
+            except ValueError as e:
+                self._add_error(key, e)
+
+    def _generate_form_fields(self):
         """
         Create a Django form from a Parameterized object.
 
-        Args:
-            parameterized_obj(Parameterized): the parameterized object.
-            set_options(dict<attrib_name, initial_value>): Dictionary of initial value for one or more fields.
-            form_field_prefix(str): A prefix to prepend to form fields
         Returns:
             Form: a Django form with fields matching the parameters of the given parameterized object.
         """
@@ -39,7 +55,31 @@ class ParamForm(Form):
                 p_name = self.form_field_prefix + p_name
             self.fields[p_name] = widget_map[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.capitalize()
-            self.fields[p_name].widget.attrs.update({'class': 'form-control', 'disabled': self.read_only})
+            if self.read_only is None:
+                widget_attribute = {'class': 'form-control'}
+            else:
+                # TODO: Should this be readonly instead of disable?
+                widget_attribute = {'class': 'form-control', 'disabled': self.read_only}
+
+            self.fields[p_name].widget.attrs.update(widget_attribute)
         # self.fields = self.base_fields
 
-# my_param_form = ParamForm(param=MyParam)
+    def as_param(self):
+        self.clean()
+        return self.param
+
+    def clean(self):
+        super().clean()
+        # Use bound data to set the value if we both have bound and initial data.
+        if self.is_bound and self.initial:
+            self._set_and_validate_data(self.data)
+            return
+        else:
+            # Set values according to bound data
+            if self.is_bound:
+                self._set_and_validate_data(self.data)
+                return
+            # Set values according to initial data
+            if self.initial:
+                self._set_and_validate_data(self.initial)
+                return
