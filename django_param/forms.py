@@ -5,20 +5,22 @@ from .widget_map import widget_map
 
 class ParamForm(forms.Form):
     _param = None
-    form_field_prefix = None
     read_only = None
     _error_key_list = []
+    cleaned_data = ""
 
     def __init__(self, *args, **kwargs):
         param_class = kwargs.pop('param_class', None)
-        read_only = kwargs.pop('read_only', None)
         if param_class is None:
-            raise KeyError('Keyword argument param_class is required')
+            raise KeyError('Keyword argument param_class is required.')
         if not isinstance(param_class, param.Parameterized):
-            raise ValueError(f'{param_class} must be an instance of param.Parameterized')
+            raise ValueError(f'{param_class} must be an instance of param.Parameterized.')
         self._param = param_class
+
+        read_only = kwargs.pop('read_only', None)
         if read_only:
             self.read_only = read_only
+
         super().__init__(*args, **kwargs)
         self._generate_form_fields()
 
@@ -51,8 +53,6 @@ class ParamForm(forms.Form):
         for p in sorted(params, key=lambda p: p.precedence or 9999):
             # TODO: Pass p.__dict__ as second argument instead of arbitrary
             p_name = p.name
-            if self.form_field_prefix is not None:
-                p_name = self.form_field_prefix + p_name
             self.fields[p_name] = widget_map[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.capitalize()
             if self.read_only is None:
@@ -69,7 +69,7 @@ class ParamForm(forms.Form):
         return self.param
 
     def clean(self):
-        super().clean()
+        self.cleaned_data = super().clean()
         # Use bound data to set the value if we both have bound and initial data.
         if self.is_bound and self.initial:
             self._set_and_validate_data(self.data)

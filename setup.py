@@ -6,7 +6,7 @@ app_package = 'django_param'
 release_package = app_package
 
 # -- Python Dependencies -- #
-dependencies = []
+dependencies = ['pytest-django', 'pytest']
 
 # -- Get Resource File -- #
 resource_files = find_resource_files(app_package, app_package)
@@ -26,4 +26,5 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=dependencies,
+    test_suite='tests'
 )
