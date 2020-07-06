@@ -27,8 +27,6 @@ import yaml
 import logging
 
 from django.contrib.messages import constants as message_constants
-from tethys_apps.utilities import get_tethys_home_dir
-from tethys_cli.gen_commands import generate_secret_key
 
 from bokeh.settings import settings
 settings.resources = 'cdn'
@@ -37,23 +35,11 @@ log = logging.getLogger(__name__)
 this_module = sys.modules[__name__]
 
 BASE_DIR = os.path.dirname(__file__)
-TETHYS_HOME = get_tethys_home_dir()
 
 local_settings = {}
-try:
-    with open(os.path.join(TETHYS_HOME, 'portal_config.yml')) as portal_yaml:
-        local_settings = yaml.safe_load(portal_yaml).get('settings', {}) or {}
-except FileNotFoundError:
-    log.info('Could not find the portal_config.yml file. To generate a new portal_config.yml run the command '
-             '"tethys gen portal_config"')
-except Exception:
-    log.exception('There was an error while attempting to read the settings from the portal_config.yml file.')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = local_settings.pop('SECRET_KEY', generate_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = local_settings.pop('DEBUG', True)
@@ -124,14 +110,6 @@ LOGGING = {
             'handlers': ['console_simple'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
         },
-        'tethys': LOGGING_CONFIG.pop('TETHYS_LOGGING', {
-            'handlers': ['console_verbose'],
-            'level': 'INFO',
-        }),
-        'tethys.apps': LOGGING_CONFIG.pop('TETHYS_APPS_LOGGING', {
-            'handlers': ['console_verbose'],
-            'level': 'INFO',
-        }),
     },
 }
 
@@ -149,12 +127,6 @@ INSTALLED_APPS = local_settings.pop('INSTALLED_APPS_OVERRIDE', [
     'django_gravatar',
     'bootstrap3',
     'termsandconditions',
-    'tethys_config',
-    'tethys_apps',
-    'tethys_gizmos',
-    'tethys_services',
-    'tethys_compute',
-    'tethys_quotas',
     'social_django',
     'guardian',
     'session_security',
@@ -174,8 +146,6 @@ MIDDLEWARE = local_settings.pop('MIDDLEWARE_OVERRIDE', [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'tethys_portal.middleware.TethysSocialAuthExceptionMiddleware',
-    'tethys_portal.middleware.TethysAppAccessMiddleware',
     'session_security.middleware.SessionSecurityMiddleware',
 
 ])
@@ -186,11 +156,6 @@ AUTHENTICATION_BACKENDS = local_settings.pop('AUTHENTICATION_BACKENDS_OVERRIDE',
     'guardian.backends.ObjectPermissionBackend',
 ])
 AUTHENTICATION_BACKENDS = tuple(local_settings.pop('AUTHENTICATION_BACKENDS', []) + AUTHENTICATION_BACKENDS)
-
-RESOURCE_QUOTA_HANDLERS = local_settings.pop('RESOURCE_QUOTA_HANDLERS_OVERRIDE', [
-    "tethys_quotas.handlers.workspace.WorkspaceQuotaHandler",
-])
-RESOURCE_QUOTA_HANDLERS = tuple(RESOURCE_QUOTA_HANDLERS + local_settings.pop('RESOURCE_QUOTA_HANDLERS', []))
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -241,14 +206,10 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
-                'tethys_config.context_processors.tethys_global_settings_context',
-                'tethys_apps.context_processors.tethys_apps_context',
-                'tethys_gizmos.context_processors.tethys_gizmos_context'
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
-                'tethys_apps.template_loaders.TethysTemplateLoader'
             ],
             'debug': DEBUG
         }
@@ -265,7 +226,6 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'tethys_apps.static_finders.TethysStaticFinder'
 )
 
 STATIC_ROOT = local_settings.pop('STATIC_ROOT', os.path.join(TETHYS_HOME, 'static'))
@@ -316,8 +276,6 @@ for setting, value in CAPTCHA_CONFIG.items():
 ANALYTICS_CONFIGS = local_settings.pop('ANALYTICS_CONFIGS', {})
 for setting, value in ANALYTICS_CONFIGS.items():
     setattr(this_module, setting, value)
-
-ASGI_APPLICATION = "tethys_portal.routing.application"
 
 # Add any additional specified settings to module
 for setting, value in local_settings.items():
