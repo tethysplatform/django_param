@@ -239,28 +239,3 @@ SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
 SOCIAL_AUTH_SLUGIFY_USERNAMES = True
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/apps/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/accounts/login/'
-
-# OAuth Providers
-OAUTH_CONFIGS = local_settings.pop('OAUTH_CONFIGS', {})
-for setting, value in OAUTH_CONFIGS.items():
-    setattr(this_module, setting, value)
-
-# Django Guardian Settings
-ANONYMOUS_USER_ID = -1
-
-CAPTCHA_CONFIG = local_settings.pop('CAPTCHA_CONFIG', {})
-for setting, value in CAPTCHA_CONFIG.items():
-    setattr(this_module, setting, value)
-# If you require reCaptcha to be loaded from somewhere other than https://google.com
-# (e.g. to bypass firewall restrictions), you can specify what proxy to use.
-# RECAPTCHA_PROXY_HOST: https://recaptcha.net
-
-# Placeholders for the ID's required by various web-analytics services supported by Django-Analytical.
-# Replace False with the tracking ID as a string e.g. SERVICE_ID = 'abcd1234'
-ANALYTICS_CONFIGS = local_settings.pop('ANALYTICS_CONFIGS', {})
-for setting, value in ANALYTICS_CONFIGS.items():
-    setattr(this_module, setting, value)
-
-# Add any additional specified settings to module
-for setting, value in local_settings.items():
-    setattr(this_module, setting, value)
