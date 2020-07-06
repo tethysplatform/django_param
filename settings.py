@@ -28,9 +28,6 @@ import logging
 
 from django.contrib.messages import constants as message_constants
 
-from bokeh.settings import settings
-settings.resources = 'cdn'
-
 log = logging.getLogger(__name__)
 this_module = sys.modules[__name__]
 
