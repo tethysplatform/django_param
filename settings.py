@@ -124,7 +124,6 @@ INSTALLED_APPS = local_settings.pop('INSTALLED_APPS_OVERRIDE', [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_gravatar',
-    'django-datetime-widget',
 ])
 INSTALLED_APPS = tuple(INSTALLED_APPS + local_settings.pop('INSTALLED_APPS', []))
 
