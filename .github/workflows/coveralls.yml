@@ -29,4 +29,4 @@ jobs:
         export DJANGO_SETTINGS_MODULE="settings"
         python setup.py develop
         pytest
-        coveralls
+        coveralls --rcfile=coverage.ini
