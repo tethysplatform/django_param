@@ -1,5 +1,4 @@
 from setuptools import setup, find_namespace_packages
-from tethys_apps.app_installation import find_resource_files
 
 # -- Apps Definition -- #
 app_package = 'django_param'
@@ -7,9 +6,6 @@ release_package = app_package
 
 # -- Python Dependencies -- #
 dependencies = ['pytest-django', 'pytest']
-
-# -- Get Resource File -- #
-resource_files = find_resource_files(app_package, app_package)
 
 setup(
     name=release_package,
@@ -22,7 +18,7 @@ setup(
     url='',
     license='',
     packages=find_namespace_packages(),
-    package_data={'': resource_files},
+    package_data={},
     include_package_data=True,
     zip_safe=False,
     install_requires=dependencies,
