@@ -124,17 +124,6 @@ INSTALLED_APPS = local_settings.pop('INSTALLED_APPS_OVERRIDE', [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_gravatar',
-    'bootstrap3',
-    'termsandconditions',
-    'social_django',
-    'guardian',
-    'session_security',
-    'captcha',
-    'snowpenguin.django.recaptcha2',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'analytical',
-    'channels',
 ])
 INSTALLED_APPS = tuple(INSTALLED_APPS + local_settings.pop('INSTALLED_APPS', []))
 
