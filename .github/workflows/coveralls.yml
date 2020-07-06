@@ -22,10 +22,10 @@ jobs:
         pip install --trusted-host pypi.python.org --upgrade pip
         pip install -r requirements_test.txt
         python setup.py install
-        export DJANGO_SETTINGS_MODULE=settings
     - name: Test with pytest
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
-        pytest --cov=.
+        export DJANGO_SETTINGS_MODULE=settings
+        pytest
         coveralls
