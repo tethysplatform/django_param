@@ -1,7 +1,9 @@
 ============
 Django_Param
 ============
-.. image:: https://coveralls.io/repos/github/Aquaveo/django_param/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/Aquaveo/django_param/badge.svg
+
+:target: https://coveralls.io/github/Aquaveo/django_param
 
 django_param is a Django app to demonstrate using param with Django Form. For each question,
 visitors can choose between a fixed number of answers.
