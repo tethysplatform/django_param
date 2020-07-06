@@ -1,3 +1,8 @@
+.. image:: https://coveralls.io/repos/github/Aquaveo/django_param/badge.svg?branch=master
+
+:target: https://coveralls.io/github/Aquaveo/django_param?branch=master
+
+
 ============
 Django_Param
 ============
