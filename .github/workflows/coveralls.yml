@@ -1,4 +1,4 @@
-name: pytest
+name: Coveralls
 
 on: [push]
 
