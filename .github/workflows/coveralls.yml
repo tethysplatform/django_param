@@ -28,5 +28,5 @@ jobs:
       run: |
         export DJANGO_SETTINGS_MODULE="settings"
         python setup.py develop
-        pytest --cov-config=coverage.ini
+        pytest
         coveralls
