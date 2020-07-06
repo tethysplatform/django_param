@@ -41,6 +41,8 @@ local_settings = {}
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
+SECRET_KEY = "29jd44fl8sbj$@)5821tss10p9ni8y)wokt)1rm#%f(pn9b!bh"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = local_settings.pop('DEBUG', True)
 
@@ -227,10 +229,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-
-STATIC_ROOT = local_settings.pop('STATIC_ROOT', os.path.join(TETHYS_HOME, 'static'))
-
-TETHYS_WORKSPACES_ROOT = local_settings.pop('TETHYS_WORKSPACES_ROOT', os.path.join(TETHYS_HOME, 'workspaces'))
 
 # Messaging settings
 MESSAGE_TAGS = {
