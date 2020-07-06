@@ -8,3 +8,4 @@ pyyaml == 5.1.2
 django-gravatar2 == 1.4.2
 psycopg2 == 2.8.4
 param == 1.9.2
+django-datetime-widget == 0.9.3
