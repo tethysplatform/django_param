@@ -135,7 +135,6 @@ INSTALLED_APPS = local_settings.pop('INSTALLED_APPS_OVERRIDE', [
     'rest_framework.authtoken',
     'analytical',
     'channels',
-    'gravatar',
 ])
 INSTALLED_APPS = tuple(INSTALLED_APPS + local_settings.pop('INSTALLED_APPS', []))
 
