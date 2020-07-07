@@ -19,16 +19,15 @@ Quick start
         'taggit',
     ]
 
-2. Run . test.sh to run test.
 
-3. Usage:
+2. Usage:
 
 .. code-block:: python
 
     # Specify your param class
     class MyParam(param.Parameterized):
-    probability = param.Number(0.5, bounds=(0, 1), doc="Probability that...")
-    test_string = param.String(default="test string", doc="Your String")
+        probability = param.Number(0.5, bounds=(0, 1), doc="Probability that...")
+        test_string = param.String(default="test string", doc="Your String")
 
     my_param = MyParam()
 
