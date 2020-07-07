@@ -3,7 +3,7 @@ name: Coveralls
 on: [push]
 
 jobs:
-  "Run Coveralls with pytest":
+  run-coveralls:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
