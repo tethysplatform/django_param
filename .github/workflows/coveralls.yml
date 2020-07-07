@@ -1,6 +1,9 @@
 name: Coveralls
 
-on: [push]
+on:
+  push:
+    tags-ignore:
+      - '*'
 
 jobs:
   run-coveralls:
