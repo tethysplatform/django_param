@@ -8,12 +8,15 @@
 """
 import param
 from django import forms
-from datetimewidget.widgets import DateWidget
+from datetimewidget.widgets import DateTimeWidget
 from django_select2.forms import Select2Widget
 from taggit.forms import TagField
 from django.forms.widgets import NumberInput, CheckboxInput, SelectMultiple, Textarea, TextInput, Select,\
     ClearableFileInput
-
+from colorfield.fields import ColorWidget
+from bootstrap_datepicker_plus import DatePickerInput
+from django_param.custom_field.dataframe import DataFrameField
+from django_param.custom_widget.dataframewidget import DataFrameWidget
 
 widget_map = {
     param.Foldername:
@@ -66,7 +69,7 @@ widget_map = {
     param.Color:
         lambda po, p, name: forms.CharField(
             initial=po.inspect_value(name) or p.default,
-            widget=TextInput,
+            widget=ColorWidget,
         ),
     param.ObjectSelector:
         lambda po, p, name: forms.ChoiceField(
@@ -92,7 +95,7 @@ widget_map = {
     param.Date:
         lambda po, p, name: forms.DateTimeField(
             initial=po.inspect_value(name) or p.default,
-            widget=DateWidget(
+            widget=DateTimeWidget(
                 options={
                     'startDate': p.bounds[0].strftime(
                         '%Y-%m-%d') if p.bounds else '0000-01-01',  # start of supported time
@@ -126,7 +129,8 @@ widget_map = {
         ),
     param.MultiFileSelector:
         lambda po, p, name: forms.MultipleChoiceField(
-            initial=po.inspect_value(name) or p.default,
+            # initial=po.inspect_value(name) or p.default,
+            choices=((x, x) for x in po.inspect_value(name)),
             widget=SelectMultiple,
         ),
     param.ClassSelector:
@@ -136,12 +140,13 @@ widget_map = {
         ),
     param.FileSelector:
         lambda po, p, name: forms.ChoiceField(
-            initial=po.inspect_value(name) or p.default,
+            choices=((x, x) for x in po.inspect_value(name)),
             widget=Select,
         ),
     param.ListSelector:
         lambda po, p, name: forms.MultipleChoiceField(
-            initial=po.inspect_value(name) or p.default,
+            choices=((x, x) for x in po.inspect_value(name)),
+            widget=SelectMultiple,
         ),
     # param.Callable,
     param.Tuple:
@@ -155,8 +160,10 @@ widget_map = {
             widget=NumberInput,
         ),
     # TODO: Implement DataFrameField someday...
-    # param.DataFrame:
-    #     lambda po, p, name: DataFrameField(
-    #         initial=po.inspect_value(name) is not None or p.default is not None
-    #     )
+    param.DataFrame:
+        lambda po, p, name: DataFrameField(
+            initial=po.dataframe,
+            widget=DataFrameWidget(),
+
+        )
 }
