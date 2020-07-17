@@ -23,6 +23,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+import yaml  # noqa: F401
 import logging
 
 from django.contrib.messages import constants as message_constants
