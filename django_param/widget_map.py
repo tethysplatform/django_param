@@ -17,6 +17,7 @@ from colorfield.fields import ColorWidget
 from bootstrap_datepicker_plus import DatePickerInput
 from django_param.custom_field.dataframe import DataFrameField
 from django_param.custom_widget.dataframewidget import DataFrameWidget
+from django_param.custom_widget.datepicker_widget import DatePickerWidget
 
 widget_map = {
     param.Foldername:
@@ -94,27 +95,17 @@ widget_map = {
         ),
     param.Date:
         lambda po, p, name: forms.DateTimeField(
-            initial=po.inspect_value(name) or p.default,
-            widget=DateTimeWidget(
-                options={
-                    'startDate': p.bounds[0].strftime(
-                        '%Y-%m-%d') if p.bounds else '0000-01-01',  # start of supported time
-                    'endDate': p.bounds[1].strftime(
-                        '%Y-%m-%d') if p.bounds else '9999-12-31',  # end of supported time
-                    'format': 'mm/dd/yyyy',
-                    'autoclose': True,
-                    # 'showMeridian': False,
-                    'minView': 2,  # month view
-                    'maxView': 4,  # 10-year overview
-                    'todayBtn': 'true',
-                    'clearBtn': True,
-                    'todayHighlight': True,
-                    'minuteStep': 5,
-                    'pickerPosition': 'bottom-left',
-                    'forceParse': 'true',
-                    'keyboardNavigation': 'true',
+            initial=po.inspect_value(name).strftime('%m-%d-%Y') or p.default.strftime('%m-%d-%Y'),
+            widget=DatePickerWidget(
+                attrs={
+                    'minDate': p.bounds[0].strftime(
+                        '%m-%d-%Y') if p.bounds else '0000-01-01',  # start of supported time
+                    'maxDate': p.bounds[1].strftime(
+                        '%m-%d-%Y') if p.bounds else '9999-12-31',  # end of supported time
+                    'format': 'm-d-Y',
+                    'formatDate': 'm-d-Y',
+                    'timepicker': 'false',
                 },
-                bootstrap_version=3
             ),
         ),
     param.List:
@@ -164,6 +155,5 @@ widget_map = {
         lambda po, p, name: DataFrameField(
             initial=po.dataframe,
             widget=DataFrameWidget(),
-
         )
 }
