@@ -8,13 +8,11 @@
 """
 import param
 from django import forms
-from datetimewidget.widgets import DateTimeWidget
 from django_select2.forms import Select2Widget
 from taggit.forms import TagField
 from django.forms.widgets import NumberInput, CheckboxInput, SelectMultiple, Textarea, TextInput, Select,\
     ClearableFileInput
 from colorfield.fields import ColorWidget
-from bootstrap_datepicker_plus import DatePickerInput
 from django_param.custom_field.dataframe import DataFrameField
 from django_param.custom_widget.dataframewidget import DataFrameWidget
 from django_param.custom_widget.datepicker_widget import DatePickerWidget
