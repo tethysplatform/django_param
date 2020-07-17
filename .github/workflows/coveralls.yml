@@ -26,6 +26,7 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
+        py3clean .
         export DJANGO_SETTINGS_MODULE="settings"
         python setup.py develop
         pytest --cov=. --cov-config=coverage.ini
