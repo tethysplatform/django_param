@@ -57,8 +57,6 @@ class ParamForm(forms.Form):
             self.fields[p_name].label = p.name.capitalize()
             if self.read_only is None:
                 widget_attribute = {'class': 'form-control'}
-                if 'readonly' in self.fields[p_name].widget.attrs:
-                    self.fields[p_name].widget.attrs.pop('readonly')
             else:
                 # TODO: Should this be readonly instead of disable?
                 widget_attribute = {'class': 'form-control', 'disabled': self.read_only}
