@@ -79,7 +79,7 @@ widget_map = {
     param.Number:
         lambda po, p, name: forms.FloatField(
             initial=po.inspect_value(name) or p.default,
-            widget=NumberInput,
+            widget=NumberInput(attrs={'step': 0.01, 'max': p.bounds[1], 'min': p.bounds[0]}),
         ),
     param.Range:
         lambda po, p, name: forms.MultiValueField(
