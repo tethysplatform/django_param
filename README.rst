@@ -34,6 +34,13 @@ Quick start
     # Initialize Django Form
     django_bound_form = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param_class=my_param)
 
+.. code-block:: html
+    <!-- Add Form -->
+    <!-- add form media in the header -->
+        {{ form.media }}
+    <!-- add form -->
+        {{ form }}
+
 3. Supported Param Class:
 + Boolean - param.Boolean(True, doc="A sample Boolean parameter")
 + Color Picker - param.Color(default='#FFFFFF')
