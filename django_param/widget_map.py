@@ -43,7 +43,7 @@ widget_map = {
             widget_map=TextInput,
         ),
     param.XYCoordinates:
-        lambda po, p, name: forms.MultiValueField(
+        lambda po, p, name: forms.CharField(
             initial=po.inspect_value(name) or p.default,
             widget=TextInput,
         ),
@@ -62,7 +62,7 @@ widget_map = {
     param.Magnitude:
         lambda po, p, name: forms.FloatField(
             initial=po.inspect_value(name) or p.default,
-            widget=NumberInput,
+            widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}),
         ),
     # param.Composite,
     param.Color:
@@ -107,8 +107,10 @@ widget_map = {
             ),
         ),
     param.List:
-        lambda po, p, name: TagField(
-            initial=po.inspect_value(name) or p.default,
+        lambda po, p, name: forms.MultipleChoiceField(
+            # initial=po.inspect_value(name) or p.default,
+            choices=((x, x) for x in po.inspect_value(name)),
+            widget=SelectMultiple,
         ),
     param.Path:
         lambda po, p, name: forms.FilePathField(
@@ -148,7 +150,6 @@ widget_map = {
             initial=po.inspect_value(name) or p.default,
             widget=NumberInput,
         ),
-    # TODO: Implement DataFrameField someday...
     param.DataFrame:
         lambda po, p, name: DataFrameField(
             initial=po.dataframe,
