@@ -6,16 +6,18 @@ app_package = 'django_param'
 release_package = app_package
 
 # -- Python Dependencies -- #
-dependencies = ['pytest-django', 'pytest']
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+
 setup(
     name=release_package,
-    version='0.0.7',
+    version='0.0.8',
     description='django_param provides ParamForm class which allows python param to be used in django form.',
     # other arguments omitted
     long_description=long_description,
@@ -29,6 +31,6 @@ setup(
     package_data={},
     include_package_data=True,
     zip_safe=False,
-    install_requires=dependencies,
+    install_requires=requirements,
     test_suite='tests'
 )

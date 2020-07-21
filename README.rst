@@ -10,13 +10,12 @@ django_param provides ParamForm class which allows python param to be used in dj
 Quick start
 -----------
 
-1. Add 'datetimewidget', 'django_select2' and 'taggit'  to your INSTALLED_APPS setting like this::
+1. Add 'django_select2' and 'django_param'  to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
         ...
-        'datetimewidget',
         'django_select2',
-        'taggit',
+        'django_param',
     ]
 
 
@@ -32,7 +31,7 @@ Quick start
     my_param = MyParam()
 
     # Initialize Django Form
-    django_bound_form = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param_class=my_param)
+    django_bound_form = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param=my_param)
 
 3. Add Form data (assuming your form is named form):
 

@@ -10,9 +10,9 @@ class ParamForm(forms.Form):
     cleaned_data = ""
 
     def __init__(self, *args, **kwargs):
-        param_class = kwargs.pop('param_class', None)
+        param_class = kwargs.pop('param', None)
         if param_class is None:
-            raise KeyError('Keyword argument param_class is required.')
+            raise KeyError('Keyword argument param is required.')
         if not isinstance(param_class, param.Parameterized):
             raise ValueError(f'{param_class} must be an instance of param.Parameterized.')
         self._param = param_class
@@ -27,6 +27,10 @@ class ParamForm(forms.Form):
     @property
     def param(self):
         return self._param
+
+    @property
+    def widget(self):
+        return widget_map
 
     def _add_error(self, key, message):
         # Only add error once for each parameter to avoid duplicate
@@ -53,7 +57,7 @@ class ParamForm(forms.Form):
         for p in sorted(params, key=lambda p: p.precedence or 9999):
             # TODO: Pass p.__dict__ as second argument instead of arbitrary
             p_name = p.name
-            self.fields[p_name] = widget_map[type(p)](self.param, p, p.name)
+            self.fields[p_name] = self.widget[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.capitalize()
             if self.read_only is None:
                 widget_attribute = {'class': 'form-control'}

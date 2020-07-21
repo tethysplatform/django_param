@@ -9,7 +9,6 @@
 import param
 from django import forms
 from django_select2.forms import Select2Widget
-from taggit.forms import TagField
 from django.forms.widgets import NumberInput, CheckboxInput, SelectMultiple, Textarea, TextInput, Select,\
     ClearableFileInput
 from colorfield.fields import ColorWidget

@@ -10,18 +10,18 @@ class MyParam(param.Parameterized):
 
 class TestForm:
     def test_form_empty(self):
-        with pytest.raises(KeyError, match="Keyword argument param_class is required."):
+        with pytest.raises(KeyError, match="Keyword argument param is required."):
             ParamForm()
 
     def test_form_invalid_param(self):
         with pytest.raises(ValueError, match="test must be an instance of param.Parameterized."):
-            ParamForm(param_class="test")
+            ParamForm(param="test")
 
     def test_form_no_bound(self):
         test_param = MyParam()
 
         # Test read-only
-        no_bound_no_initial = ParamForm(param_class=test_param, read_only=True)
+        no_bound_no_initial = ParamForm(param=test_param, read_only=True)
         no_bound_no_initial.clean()
         expected_html = '<tr><th><label for="id_probability">Probability:</label></th><td><input type="number"' \
                         ' name="probability" value="0.5" step="0.01" max="1" min="0" class="form-control" disabled' \
@@ -37,7 +37,7 @@ class TestForm:
     def test_form_initial(self):
         test_param = MyParam()
 
-        initial = ParamForm(initial={'probability': 0.2, 'test_string': 'test_initial'}, param_class=test_param)
+        initial = ParamForm(initial={'probability': 0.2, 'test_string': 'test_initial'}, param=test_param)
         initial.clean()
         expected_html = '<tr><th><label for="id_probability">Probability:</label></th><td><input type="number"' \
                         ' name="probability" value="0.2" step="0.01" max="1" min="0" class="form-control"' \
@@ -59,7 +59,7 @@ class TestForm:
         test_param = MyParam()
 
         # Bound:
-        bound = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param_class=test_param)
+        bound = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param=test_param)
         expected_html = '<tr><th><label for="id_probability">Probability:</label></th><td><input type="number"' \
                         ' name="probability" value="0.1" step="0.01" max="1" min="0" class="form-control"' \
                         ' required id="id_probability"></td></tr>\n<tr><th><label for="id_test_string">' \
@@ -76,7 +76,7 @@ class TestForm:
         # Bound and with initial. It should use the bound data and return errors:
         data = {'probability': 0.2, 'test_string': 'test'}
         data_new = {'probability': 0.8, 'test_string': 'new string'}
-        form = ParamForm(data, initial=data, param_class=test_param)
+        form = ParamForm(data, initial=data, param=test_param)
         form.clean()
         # Check if form has changed
         assert form.has_changed() is False
@@ -84,7 +84,7 @@ class TestForm:
         assert form.as_param().test_string == 'test'
 
         # Change form
-        form = ParamForm(data_new, initial=data, param_class=test_param)
+        form = ParamForm(data_new, initial=data, param=test_param)
 
         # Check results
         assert form.is_bound is True
@@ -97,7 +97,7 @@ class TestForm:
         test_param = MyParam()
         # Bound and with initial. It should use the bound data and return errors:
         bound_error = ParamForm({'probability': 2, 'test_string': 'test'}, initial={'probability': 0.2},
-                                param_class=test_param)
+                                param=test_param)
         bound_error.clean()
         error_message = {'probability': ["Parameter 'probability' must be at most 1"]}
         # Check results
@@ -114,6 +114,6 @@ class TestForm:
                         ' class="form-control" required id="id_prefix-test_string">\ntest string</textarea></td></tr>'
 
         # Check results
-        form = ParamForm(param_class=test_param, prefix="prefix")
+        form = ParamForm(param=test_param, prefix="prefix")
         assert form.is_bound is False
         assert str(form) == expected_html
