@@ -8,9 +8,12 @@ class ParamForm(forms.Form):
     read_only = None
     _error_key_list = []
     cleaned_data = ""
+    widget_map = widget_map
 
     def __init__(self, *args, **kwargs):
         param_class = kwargs.pop('param', None)
+        if 'csrfmiddlewaretoken' in kwargs:
+            kwargs.pop('csrfmiddlewaretoken', None)
         if param_class is None:
             raise KeyError('Keyword argument param is required.')
         if not isinstance(param_class, param.Parameterized):
@@ -21,6 +24,10 @@ class ParamForm(forms.Form):
         if read_only:
             self.read_only = read_only
 
+        custom_widget_map = kwargs.pop('widget_map', None)
+        if custom_widget_map:
+            self.widget_map = custom_widget_map
+
         super().__init__(*args, **kwargs)
         self._generate_form_fields()
 
@@ -30,7 +37,7 @@ class ParamForm(forms.Form):
 
     @property
     def widget(self):
-        return widget_map
+        return self.widget_map
 
     def _add_error(self, key, message):
         # Only add error once for each parameter to avoid duplicate
@@ -57,8 +64,9 @@ class ParamForm(forms.Form):
         for p in sorted(params, key=lambda p: p.precedence or 9999):
             # TODO: Pass p.__dict__ as second argument instead of arbitrary
             p_name = p.name
+            breakpoint()
             self.fields[p_name] = self.widget[type(p)](self.param, p, p.name)
-            self.fields[p_name].label = p.name.capitalize()
+            self.fields[p_name].label = p.name.replace("_", " ").title()
             if self.read_only is None:
                 widget_attribute = {'class': 'form-control'}
             else:
@@ -72,7 +80,8 @@ class ParamForm(forms.Form):
         return self.param
 
     def clean(self):
-        self.cleaned_data = super().clean()
+        self.cleaned_data()
+        breakpoint()
         # Use bound data to set the value if we both have bound and initial data.
         if self.is_bound and self.initial:
             self._set_and_validate_data(self.data)

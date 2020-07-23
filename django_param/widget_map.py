@@ -56,7 +56,7 @@ widget_map = {
     param.parameterized.String:
         lambda po, p, name: forms.CharField(
             initial=po.inspect_value(name) or p.default,
-            widget=Textarea,
+            widget=TextInput,
         ),
     param.Magnitude:
         lambda po, p, name: forms.FloatField(
@@ -78,7 +78,8 @@ widget_map = {
     param.Number:
         lambda po, p, name: forms.FloatField(
             initial=po.inspect_value(name) or p.default,
-            widget=NumberInput(attrs={'step': 0.01, 'max': p.bounds[1], 'min': p.bounds[0]}),
+            widget=NumberInput(attrs={'step': 0.01, 'max': None if not p.bounds else p.bounds[1],
+                                      'min': None if not p.bounds else p.bounds[0]}),
         ),
     param.Range:
         lambda po, p, name: forms.MultiValueField(
@@ -151,7 +152,7 @@ widget_map = {
         ),
     param.DataFrame:
         lambda po, p, name: DataFrameField(
-            initial=po.dataframe,
+            initial=getattr(po, name),
             widget=DataFrameWidget(),
         )
 }
