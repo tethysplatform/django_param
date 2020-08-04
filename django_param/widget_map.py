@@ -8,20 +8,25 @@
 """
 import param
 from django import forms
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2Widget, Select2MultipleWidget
 from django.forms.widgets import NumberInput, CheckboxInput, SelectMultiple, Textarea, TextInput, Select,\
     ClearableFileInput
 from colorfield.fields import ColorWidget
 from django_param.custom_field.dataframe import DataFrameField
+from django_param.custom_field.tuplefield import TupleField, NumericTupleField, XYTupleField, RangeTupleField
 from django_param.custom_widget.dataframewidget import DataFrameWidget
 from django_param.custom_widget.datepicker_widget import DatePickerWidget
+from django_param.custom_widget.tuplefiled_widget import TupleFieldWidget, NumericTupleFieldWidget, XYTupleFieldWidget,\
+    RangeTupleFieldWidget
 
 widget_map = {
     param.Foldername:
         lambda po, p, name: forms.FilePathField(
             initial=po.inspect_value(name) or p.default,
             path=p.search_paths,
-            widget=Select,
+            allow_files=False,
+            allow_folders=True,
+            widget=Select2Widget,
         ),
     param.Boolean:
         lambda po, p, name: forms.BooleanField(
@@ -41,15 +46,11 @@ widget_map = {
             initial=po.inspect_value(name) or p.default,
             widget_map=TextInput,
         ),
-    param.XYCoordinates:
-        lambda po, p, name: forms.CharField(
-            initial=po.inspect_value(name) or p.default,
-            widget=TextInput,
-        ),
     param.Selector:
         lambda po, p, name: forms.ChoiceField(
             initial=po.inspect_value(name) or p.default,
-            widget=Select,
+            widget=Select2Widget,
+            choices=p.get_range().items(),
         ),
     # param.HookList,
     # param.Action: ,
@@ -72,7 +73,7 @@ widget_map = {
     param.ObjectSelector:
         lambda po, p, name: forms.ChoiceField(
             initial=po.inspect_value(name) or p.default,
-            widget=Select2Widget,
+            widget=Select2MultipleWidget,
             choices=p.get_range().items(),
         ),
     param.Number:
@@ -81,25 +82,30 @@ widget_map = {
             widget=NumberInput(attrs={'step': 0.01, 'max': None if not p.bounds else p.bounds[1],
                                       'min': None if not p.bounds else p.bounds[0]}),
         ),
-    param.Range:
-        lambda po, p, name: forms.MultiValueField(
-            initial=po.inspect_value(name) or p.default,
-            widget=TextInput,
-        ),
-    param.NumericTuple:
-        lambda po, p, name: forms.MultiValueField(
-            initial=po.inspect_value(name) or p.default,
-            widget=TextInput,
-        ),
     param.Date:
         lambda po, p, name: forms.DateTimeField(
-            initial=po.inspect_value(name).strftime('%m-%d-%Y') or p.default.strftime('%m-%d-%Y'),
+            initial=po.inspect_value(name).strftime('%m-%d-%Y %H:%M') or p.default.strftime('%m-%d-%Y'),
             widget=DatePickerWidget(
                 attrs={
                     'minDate': p.bounds[0].strftime(
                         '%m-%d-%Y') if p.bounds else '0000-01-01',  # start of supported time
                     'maxDate': p.bounds[1].strftime(
                         '%m-%d-%Y') if p.bounds else '9999-12-31',  # end of supported time
+                    'format': 'm-d-Y H:i',
+                    'formatDate': 'm-d-Y',
+                    'timepicker': 'true',
+                },
+            ),
+        ),
+    param.CalendarDate:
+        lambda po, p, name: forms.DateTimeField(
+            initial=po.inspect_value(name).strftime('%m-%d-%Y') or p.default.strftime('%m-%d-%Y'),
+            widget=DatePickerWidget(
+                attrs={
+                    'minDate': p.bounds[0].strftime(
+                        '%m-%d-%Y') if p.bounds else '01-01-1900',  # start of supported time
+                    'maxDate': p.bounds[1].strftime(
+                        '%m-%d-%Y') if p.bounds else '12-31-9999',  # end of supported time
                     'format': 'm-d-Y',
                     'formatDate': 'm-d-Y',
                     'timepicker': 'false',
@@ -116,13 +122,15 @@ widget_map = {
         lambda po, p, name: forms.FilePathField(
             initial=po.inspect_value(name) or p.default,
             path=p.search_paths,
-            widget=Select,
+            allow_files=True,
+            allow_folders=False,
+            widget=Select2Widget,
         ),
     param.MultiFileSelector:
         lambda po, p, name: forms.MultipleChoiceField(
             # initial=po.inspect_value(name) or p.default,
             choices=((x, x) for x in po.inspect_value(name)),
-            widget=SelectMultiple,
+            widget=Select2MultipleWidget,
         ),
     param.ClassSelector:
         lambda po, p, name: forms.ChoiceField(
@@ -137,13 +145,36 @@ widget_map = {
     param.ListSelector:
         lambda po, p, name: forms.MultipleChoiceField(
             choices=((x, x) for x in po.inspect_value(name)),
-            widget=SelectMultiple,
+            widget=Select2MultipleWidget,
         ),
     # param.Callable,
     param.Tuple:
-        lambda po, p, name: forms.MultiValueField(
+        lambda po, p, name: TupleField(
             initial=po.inspect_value(name) or p.default,
-            widget=TextInput,
+            required=False,
+            fields={name: getattr(po, name)} if getattr(po, name) else {name: p.default},
+            widget=TupleFieldWidget,
+        ),
+    param.NumericTuple:
+        lambda po, p, name: NumericTupleField(
+            initial=po.inspect_value(name) or p.default,
+            required=False,
+            fields={name: getattr(po, name)} if getattr(po, name) else {name: p.default},
+            widget=NumericTupleFieldWidget,
+        ),
+    param.XYCoordinates:
+        lambda po, p, name: XYTupleField(
+            initial=po.inspect_value(name) or p.default,
+            required=False,
+            fields={name: getattr(po, name)} if getattr(po, name) else {name: p.default},
+            widget=XYTupleFieldWidget,
+        ),
+    param.Range:
+        lambda po, p, name: RangeTupleField(
+            initial=po.inspect_value(name) or p.default,
+            required=False,
+            fields={name: getattr(po, name)} if getattr(po, name) else {name: p.default},
+            widget=RangeTupleFieldWidget,
         ),
     param.Integer:
         lambda po, p, name: forms.IntegerField(

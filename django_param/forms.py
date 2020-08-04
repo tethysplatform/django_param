@@ -27,7 +27,6 @@ class ParamForm(forms.Form):
         custom_widget_map = kwargs.pop('widget_map', None)
         if custom_widget_map:
             self.widget_map = custom_widget_map
-
         super().__init__(*args, **kwargs)
         self._generate_form_fields()
 
@@ -47,10 +46,15 @@ class ParamForm(forms.Form):
 
     def _set_and_validate_data(self, data):
         for key, value in data.items():
-            try:
-                self.param.set_param(key, value)
-            except ValueError as e:
-                self._add_error(key, e)
+            if key != 'csrfmiddlewaretoken':
+                try:
+                    # Do this to preserver the data from queryDict.
+                    value_temp = data.getlist(key)
+                    if len(value_temp) > 1:
+                        value = tuple(value_temp)
+                    self.param.set_param(key, value)
+                except ValueError as e:
+                    self._add_error(key, e)
 
     def _generate_form_fields(self):
         """
@@ -64,7 +68,9 @@ class ParamForm(forms.Form):
         for p in sorted(params, key=lambda p: p.precedence or 9999):
             # TODO: Pass p.__dict__ as second argument instead of arbitrary
             p_name = p.name
-            breakpoint()
+            if self.data:
+                if isinstance(getattr(self.param, p.name), tuple):
+                    p.default = tuple(self.data.getlist(p.name))
             self.fields[p_name] = self.widget[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.replace("_", " ").title()
             if self.read_only is None:
@@ -80,8 +86,7 @@ class ParamForm(forms.Form):
         return self.param
 
     def clean(self):
-        self.cleaned_data()
-        breakpoint()
+        self.cleaned_data = super().clean()
         # Use bound data to set the value if we both have bound and initial data.
         if self.is_bound and self.initial:
             self._set_and_validate_data(self.data)
