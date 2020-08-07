@@ -5,3 +5,4 @@ param>=1.9,<2.0
 django>=2.2,<2.3
 django-select2>=7.1,<7.2
 django-colorfield>=0.3,<0.4
+pandas>=0.25,<0.26

@@ -34,7 +34,7 @@
                     <td>
                         <input {% if is_numeric %}type="number"{% else %}type="text"{% endif %}
                                class="form-field"
-                               name="{{ column }}"
+                               name="{{ column|add:widget.dataframe_prefix }}"
                                value="{{ val }}"
                                {% if column in read_only_columns %}disabled{% endif %}>
                     </td>

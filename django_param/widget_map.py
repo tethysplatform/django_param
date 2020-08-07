@@ -46,12 +46,6 @@ widget_map = {
             initial=po.inspect_value(name) or p.default,
             widget_map=TextInput,
         ),
-    param.Selector:
-        lambda po, p, name: forms.ChoiceField(
-            initial=po.inspect_value(name) or p.default,
-            widget=Select2Widget,
-            choices=p.get_range().items(),
-        ),
     # param.HookList,
     # param.Action: ,
     param.parameterized.String:
@@ -73,7 +67,7 @@ widget_map = {
     param.ObjectSelector:
         lambda po, p, name: forms.ChoiceField(
             initial=po.inspect_value(name) or p.default,
-            widget=Select2MultipleWidget,
+            widget=Select2Widget,
             choices=p.get_range().items(),
         ),
     param.Number:
@@ -84,7 +78,8 @@ widget_map = {
         ),
     param.Date:
         lambda po, p, name: forms.DateTimeField(
-            initial=po.inspect_value(name).strftime('%m-%d-%Y %H:%M') or p.default.strftime('%m-%d-%Y'),
+            initial=po.inspect_value(name).strftime('%m-%d-%Y %H:%M'),
+            input_formats=['%m-%d-%Y %H:%M'],
             widget=DatePickerWidget(
                 attrs={
                     'minDate': p.bounds[0].strftime(
@@ -99,7 +94,8 @@ widget_map = {
         ),
     param.CalendarDate:
         lambda po, p, name: forms.DateTimeField(
-            initial=po.inspect_value(name).strftime('%m-%d-%Y') or p.default.strftime('%m-%d-%Y'),
+            initial=po.inspect_value(name).strftime('%m-%d-%Y'),
+            input_formats=['%m-%d-%Y'],
             widget=DatePickerWidget(
                 attrs={
                     'minDate': p.bounds[0].strftime(
@@ -129,7 +125,7 @@ widget_map = {
     param.MultiFileSelector:
         lambda po, p, name: forms.MultipleChoiceField(
             # initial=po.inspect_value(name) or p.default,
-            choices=((x, x) for x in po.inspect_value(name)),
+            choices=((x, x) for x in p.default),
             widget=Select2MultipleWidget,
         ),
     param.ClassSelector:
@@ -139,12 +135,17 @@ widget_map = {
         ),
     param.FileSelector:
         lambda po, p, name: forms.ChoiceField(
-            choices=((x, x) for x in po.inspect_value(name)),
-            widget=Select,
+            choices=((x, x) for x in p.default),
+            widget=Select2Widget,
+        ),
+    param.Selector:
+        lambda po, p, name: forms.ChoiceField(
+            choices=((x, x) for x in p.default),
+            widget=Select2Widget,
         ),
     param.ListSelector:
         lambda po, p, name: forms.MultipleChoiceField(
-            choices=((x, x) for x in po.inspect_value(name)),
+            choices=((x, x) for x in p.default),
             widget=Select2MultipleWidget,
         ),
     # param.Callable,
