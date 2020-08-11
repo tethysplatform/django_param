@@ -77,7 +77,8 @@ Quick start
 
 5. You can also override the default widget with your own custom widget. For example:
 
-..code-block: python
+.. code-block:: python
+
     widget_map = {
         param.parameterized.String:
             lambda po, p, name: forms.CharField(
