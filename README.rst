@@ -10,12 +10,13 @@ django_param provides ParamForm class which allows python param to be used in dj
 Quick start
 -----------
 
-1. Add 'django_select2' and 'django_param'  to your INSTALLED_APPS setting like this::
+1. Add 'django_select2', 'django_param' and 'django.forms' to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
         ...
         'django_select2',
         'django_param',
+        'django.forms'
     ]
 
 
@@ -31,23 +32,57 @@ Quick start
     my_param = MyParam()
 
     # Initialize Django Form
-    django_bound_form = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param=my_param)
+    django_form = ParamForm({'probability': 0.1, 'test_string': 'test_bound'}, param=my_param)
+
+    # Get data from request.POST
+    django_form = ParamForm(request.POST, param=my_param)
+
+    # To return param with values from request.POST
+    param = django_form.as_param()
+
 
 3. Add Form data (assuming your form is named form):
 
 - First you need to add the form media, you can include {{ form.media }} in your header page.
 - To add the form, simply use {{ form }}
+- you can pass your param to the page and retrieve the values using
+
+.. code-block:: html
+
+    {% for p in param.get_param_values %}
+        <li>{{ p.0 }}: {{ p.1 }}</li>
+    {% endfor %}
+
 
 4. Supported Param Class:
 
-- Boolean - param.Boolean(True, doc="A sample Boolean parameter")
-- Color Picker - param.Color(default='#FFFFFF')
-- Dataframe (Pandas) - param.DataFrame(pd.util.testing.makeDataFrame().iloc[:3])
-- Date - param.Date(dt.datetime(2017, 1, 1), bounds=(dt.datetime(2017, 1, 1), dt.datetime(2017, 2, 1)))
-- List - param.List(default=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-- Magnitude - param.Magnitude(default=0.9)
-- Multiple Files - param.MultiFileSelector(path='*', precedence=0.5)
-- Number - param.Number(49, bounds=(0, 100), doc="Any Number between 0 to 100")
-- Select String - select_string = param.ObjectSelector(default="yellow", objects=["red", "yellow", "green"])
-- String - param.String(default="hello world!", doc="Your String")
-- XY Coordinates - param.XYCoordinates(default=(-111.65, 40.23))
+- Boolean
+- Color
+- CalendarDate
+- DataFrame
+- Date
+- FileSelector
+- List
+- ListSelector
+- Magnitude
+- MultiFileSelector
+- NumericTuple
+- ObjectSelector
+- Range
+- Selector
+- String
+- Tuple
+- XYCoordinates
+
+5. You can also override the default widget with your own custom widget. For example:
+
+..code-block: python
+    widget_map = {
+        param.parameterized.String:
+            lambda po, p, name: forms.CharField(
+                initial=po.inspect_value(name) or p.default,
+                widget=Textarea,
+            ),
+    }
+
+    form = ParamForm(param=my_param, widget_map=widget_map)

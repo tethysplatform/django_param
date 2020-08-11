@@ -129,4 +129,3 @@ class RangeTupleFieldWidget(TupleFieldWidget):
 class XYNumberInput(forms.NumberInput):
     # Template works for both range and xy coordinates
     template_name = 'django_param/tuplefield/xytuplefield.html'
-

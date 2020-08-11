@@ -2,7 +2,6 @@ from django import forms
 import param
 from .widget_map import widget_map
 from pandas import DataFrame
-from django_param.custom_field.dataframe import DataFrameField
 from datetime import datetime, date
 
 
@@ -15,8 +14,6 @@ class ParamForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         param_class = kwargs.pop('param', None)
-        if 'csrfmiddlewaretoken' in kwargs:
-            kwargs.pop('csrfmiddlewaretoken', None)
         if param_class is None:
             raise KeyError('Keyword argument param is required.')
         if not isinstance(param_class, param.Parameterized):
@@ -68,10 +65,7 @@ class ParamForm(forms.Form):
             data_dict[key] = data.getlist(key + "___" + dataframe_name + "__")
         value = DataFrame.from_dict(data_dict)
         # Update param
-        try:
-            self.param.set_param(dataframe_name, value)
-        except ValueError as e:
-            self._add_error(dataframe_name, e)
+        self.param.set_param(dataframe_name, value)
 
     def _set_and_validate_data_name(self, data, name):
         # Find out if it is dataframe
