@@ -17,7 +17,7 @@ with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name=release_package,
-    version='0.0.8',
+    version='0.0.9',
     description='django_param provides ParamForm class which allows python param to be used in django form.',
     # other arguments omitted
     long_description=long_description,

@@ -10,10 +10,11 @@ django_param provides ParamForm class which allows python param to be used in dj
 Quick start
 -----------
 
-1. Add 'django_select2', 'django_param' and 'django.forms' to your INSTALLED_APPS setting like this::
+1. Add 'colorfield', 'django_select2', 'django_param' and 'django.forms' to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
         ...
+        'colorfield',
         'django_select2',
         'django_param',
         'django.forms'
