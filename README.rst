@@ -17,7 +17,6 @@ Quick start
         'colorfield',
         'django_select2',
         'django_param',
-        'django.forms'
     ]
 
 
@@ -63,7 +62,6 @@ Quick start
 - DataFrame
 - Date
 - FileSelector
-- List
 - ListSelector
 - Magnitude
 - MultiFileSelector
@@ -75,14 +73,14 @@ Quick start
 - Tuple
 - XYCoordinates
 
-5. You can also override the default widget with your own custom widget. For example:
+5. You can also override any default widget with your own custom widget. For example:
 
 .. code-block:: python
 
     widget_map = {
-        param.parameterized.String:
-            lambda po, p, name: forms.CharField(
-                initial=po.inspect_value(name) or p.default,
+        param.String:
+            lambda parameterized_object, parameter, name: forms.CharField(
+                initial=parameterized_object.inspect_value(name) or parameter.default,
                 widget=Textarea,
             ),
     }
