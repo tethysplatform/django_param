@@ -37,9 +37,12 @@ widget_map = {
     # param.Array: ,
     # param.Dynamic: ,
     param.Filename:
-        lambda po, p, name: forms.FileField(
+        lambda po, p, name: forms.FilePathField(
             initial=po.inspect_value(name) or p.default,
-            widget=ClearableFileInput,
+            path=p.search_paths,
+            allow_files=True,
+            allow_folders=False,
+            widget=Select2Widget,
         ),
     param.Dict:
         lambda po, p, name: forms.CharField(
@@ -67,8 +70,8 @@ widget_map = {
     param.ObjectSelector:
         lambda po, p, name: forms.ChoiceField(
             initial=po.inspect_value(name) or p.default,
-            widget=Select2Widget,
             choices=p.get_range().items(),
+            widget=Select2Widget,
         ),
     param.Number:
         lambda po, p, name: forms.FloatField(
@@ -119,7 +122,7 @@ widget_map = {
             initial=po.inspect_value(name) or p.default,
             path=p.search_paths,
             allow_files=True,
-            allow_folders=False,
+            allow_folders=True,
             widget=Select2Widget,
         ),
     param.MultiFileSelector:
@@ -140,7 +143,8 @@ widget_map = {
         ),
     param.Selector:
         lambda po, p, name: forms.ChoiceField(
-            choices=((x, x) for x in p.default),
+            initial=po.inspect_value(name) or p.default,
+            choices=p.get_range().items(),
             widget=Select2Widget,
         ),
     param.ListSelector:
