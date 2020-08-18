@@ -41,7 +41,7 @@ class DataFrameWidget(forms.Widget):
         """
         data_dict = {}
         for key, value in data.items():
-            if key != 'csrfmiddlewaretoken':
+            if key[-2:] == "__":
                 data_dict[key.replace("___" + name + "__", "")] = data.getlist(key)
         dataframe = pd.DataFrame.from_dict(data_dict)
 

@@ -18,6 +18,8 @@ from django_param.custom_widget.dataframewidget import DataFrameWidget
 from django_param.custom_widget.datepicker_widget import DatePickerWidget
 from django_param.custom_widget.tuplefiled_widget import TupleFieldWidget, NumericTupleFieldWidget, XYTupleFieldWidget,\
     RangeTupleFieldWidget
+from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
+
 
 widget_map = {
     param.Foldername:
@@ -32,7 +34,7 @@ widget_map = {
         lambda po, p, name: forms.BooleanField(
             initial=po.inspect_value(name) or p.default,
             required=False,
-            widget=CheckboxInput,
+            widget=CustomCheckboxInput,
         ),
     # param.Array: ,
     # param.Dynamic: ,
@@ -66,12 +68,6 @@ widget_map = {
         lambda po, p, name: forms.CharField(
             initial=po.inspect_value(name) or p.default,
             widget=ColorWidget,
-        ),
-    param.ObjectSelector:
-        lambda po, p, name: forms.ChoiceField(
-            initial=po.inspect_value(name) or p.default,
-            choices=p.get_range().items(),
-            widget=Select2Widget,
         ),
     param.Number:
         lambda po, p, name: forms.FloatField(
@@ -113,8 +109,8 @@ widget_map = {
         ),
     param.List:
         lambda po, p, name: forms.MultipleChoiceField(
-            # initial=po.inspect_value(name) or p.default,
-            choices=((x, x) for x in po.inspect_value(name)),
+            initial=po.inspect_value(name) or p.default,
+            choices=p.get_range().items(),
             widget=SelectMultiple,
         ),
     param.Path:
@@ -127,18 +123,20 @@ widget_map = {
         ),
     param.MultiFileSelector:
         lambda po, p, name: forms.MultipleChoiceField(
-            # initial=po.inspect_value(name) or p.default,
-            choices=((x, x) for x in p.default),
+            initial=po.inspect_value(name),
+            choices=p.get_range().items(),
             widget=Select2MultipleWidget,
         ),
     param.ClassSelector:
         lambda po, p, name: forms.ChoiceField(
             initial=po.inspect_value(name) or p.default,
+            choices=p.get_range().items(),
             widget=Select,
         ),
     param.FileSelector:
         lambda po, p, name: forms.ChoiceField(
-            choices=((x, x) for x in p.default),
+            initial=po.inspect_value(name),
+            choices=p.get_range().items(),
             widget=Select2Widget,
         ),
     param.Selector:
@@ -149,8 +147,15 @@ widget_map = {
         ),
     param.ListSelector:
         lambda po, p, name: forms.MultipleChoiceField(
-            choices=((x, x) for x in p.default),
+            initial=po.inspect_value(name) or p.default,
+            choices=p.get_range().items(),
             widget=Select2MultipleWidget,
+        ),
+    param.ObjectSelector:
+        lambda po, p, name: forms.ChoiceField(
+            initial=po.inspect_value(name) or p.default,
+            choices=p.get_range().items(),
+            widget=Select2Widget,
         ),
     # param.Callable,
     param.Tuple:

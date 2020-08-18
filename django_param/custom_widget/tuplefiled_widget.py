@@ -1,5 +1,6 @@
 from django import forms
 import pickle
+from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
 
 
 class TupleFieldWidget(forms.widgets.MultiWidget):
@@ -68,16 +69,29 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
+        skip_iter = False
         for i in range(len(value)):
+            if skip_iter:
+                skip_iter = False
+                continue
+
+            # Find out if we should have the checkbox on or off
+            check_status = True
             if isinstance(value[i], (float, int)):
                 # Since bool inherits from int
                 if isinstance(value[i], bool):
-                    self.widgets.append(forms.CheckboxInput())
+                    self.widgets.append(CustomCheckboxInput(check_status=check_status))
                 else:
                     self.widgets.append(forms.NumberInput())
             else:
-                if value[i] == "on":
-                    self.widgets.append(forms.CheckboxInput())
+                if bool(value[i]):
+                    if i < len(value) - 1:
+                        if bool(value[i + 1]):
+                            skip_iter = True
+                    else:
+                        check_status = False
+                    self.widgets.append(CustomCheckboxInput(check_status=check_status))
+
                 else:
                     self.widgets.append(forms.TextInput())
 
@@ -98,7 +112,7 @@ class NumericTupleFieldWidget(TupleFieldWidget):
         for i in range(len(value)):
             self.widgets.append(forms.NumberInput())
 
-        context = self.custom_get_context(self, name, value, attrs, context)
+        context = self.custom_get_context(name, value, attrs, context)
         return context
 
 

@@ -126,7 +126,7 @@ INSTALLED_APPS = local_settings.pop('INSTALLED_APPS_OVERRIDE', [
     'colorfield',
     'django_select2',
     'django_param',
-    'django.forms',
+    # 'django.forms',
 ])
 INSTALLED_APPS = tuple(INSTALLED_APPS + local_settings.pop('INSTALLED_APPS', []))
 

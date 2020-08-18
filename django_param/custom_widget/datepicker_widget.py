@@ -12,7 +12,7 @@ class DatePickerWidget(forms.Widget):
         ]
 
     def get_context(self, name, value, attrs):
-        context = {}
+        context = dict()
         context['widget'] = {
             'name': name,
             'is_hidden': self.is_hidden,

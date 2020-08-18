@@ -70,7 +70,7 @@ class ParamForm(forms.Form):
     def _set_and_validate_data_name(self, data, name):
         # Find out if it is dataframe
         is_dict = False
-        if isinstance(self.param.params()[name], (param.List, param.ListSelector, param.ObjectSelector)):
+        if isinstance(self.param.params()[name], (param.List, param.ListSelector)):
             is_dict = True
         value_temp = data.getlist(name)
 
@@ -79,10 +79,10 @@ class ParamForm(forms.Form):
             value = clean_data(value_temp, is_dict=is_dict)
         else:
             value = clean_data(data.get(name), is_dict=is_dict)
-
         # Selector only take one value, not list.
-        if isinstance(self.param.params()[name], (param.Selector, param.FileSelector)):
-            if isinstance(value, list) and len(value) > 0:
+        if isinstance(self.param.params()[name], (param.Selector, param.FileSelector, param.ObjectSelector))\
+                and not isinstance(self.param.params()[name], param.ObjectSelector):
+            if isinstance(value, list) and len(value) == 1:
                 value = value[0]
 
         # Convert to datetime object if neccessary
@@ -94,6 +94,22 @@ class ParamForm(forms.Form):
             else:
                 date_time_format = '%m-%d-%Y'
                 value = datetime.strptime(date_time_str, date_time_format).date()
+
+        if isinstance(self.param.params()[name], param.Boolean):
+            # in tuple with length 2 is True
+            if isinstance(value, tuple):
+                value = True if len(value) > 1 else False
+            else:
+                value = False
+
+        if isinstance(self.param.params()[name], param.Tuple):
+            if isinstance(value, tuple):
+                # value (False, False) is True.
+                if len(value) == 2:
+                    if type(value[0]) == bool and type(value[1]) == bool:
+                        value = (True, )
+            elif type(value) == bool:
+                value = (value, )
         try:
             # Update param
             self.param.set_param(name, value)
@@ -119,10 +135,9 @@ class ParamForm(forms.Form):
                     p.default = tuple(self.data.getlist(p.name))
 
             # Preserve initial options for Selector
-            if isinstance(self.param.params()[p_name],
-                          (param.Selector, param.ListSelector, param.ObjectSelector, param.FileSelector,
-                           param.MultiFileSelector)):
-                p.default = self.param.params()[p_name].objects
+            if isinstance(self.param.params()[p_name], (param.FileSelector, param.MultiFileSelector)):
+                p.default = ""
+
             self.fields[p_name] = self.widget[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.replace("_", " ").title()
             if self.read_only is None:
@@ -131,6 +146,9 @@ class ParamForm(forms.Form):
                 # TODO: Should this be readonly instead of disable?
                 widget_attribute = {'class': 'form-control', 'disabled': self.read_only}
             self.fields[p_name].widget.attrs.update(widget_attribute)
+            self.fields[p_name].required = not self.param.params()[p_name].allow_None
+            self.fields[p_name].disabled = self.param.params()[p_name].constant
+            self.fields[p_name].help_text = self.param.params()[p_name].doc
         # self.fields = self.base_fields
 
     def as_param(self):
