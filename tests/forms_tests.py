@@ -29,10 +29,6 @@ class MyParamColor(param.Parameterized):
     color = param.Color(default='#FFFFFF')
 
 
-class MyParamList(param.Parameterized):
-    list = param.List(default=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-
-
 class MyParamSelector(param.Parameterized):
     selector = param.Selector(objects=["red", "yellow", "green", "blue"])
 
@@ -55,7 +51,7 @@ class MyParamDateTime(param.Parameterized):
 
 
 class MyParamBoolean(param.Parameterized):
-    boolean = param.Boolean(True, doc="A sample Boolean parameter")
+    boolean = param.Boolean(True, doc="A sample Boolean parameter", allow_None=True)
 
 
 class MyParamMagnitude(param.Parameterized):
@@ -71,7 +67,7 @@ class MyParamRange(param.Parameterized):
 
 
 class MyParamTuple(param.Parameterized):
-    my_tuples = param.Tuple(default=("test", 50, 'Aquaveo', 100, "Hello", True))
+    my_tuples = param.Tuple(default=("test", 50, 'Aquaveo', 100, "Hello", True), allow_None=True)
 
 
 class MyParamNumericTuple(param.Parameterized):
@@ -102,10 +98,12 @@ class TestForm:
         no_bound_no_initial = ParamForm(param=test_param, read_only=True)
         no_bound_no_initial.clean()
         expected_html = '<tr><th><label for="id_probability">Probability:</label></th><td><input type="number"' \
-                        ' name="probability" value="0.5" step="0.01" max="1" min="0" class="form-control" disabled' \
-                        ' required id="id_probability"></td></tr>\n<tr><th><label for="id_test_string">Test String:' \
-                        '</label></th><td><input type="text" name="test_string" value="test string"' \
-                        ' class="form-control" disabled required id="id_test_string"></td></tr>'
+                        ' name="probability" value="0.5" step="0.01" max="1" min="0" class="form-control"' \
+                        ' disabled required id="id_probability"><br><span class="helptext">Probability' \
+                        ' that...</span></td></tr>\n<tr><th><label for="id_test_string">Test String:</label>' \
+                        '</th><td><input type="text" name="test_string" value="test string" class="form-control"' \
+                        ' disabled required id="id_test_string"><br><span class="helptext">Probability that...</span>' \
+                        '</td></tr>'
         # Check results. No bound has no data for validation so is_valid is false
         str(no_bound_no_initial)
         assert str(no_bound_no_initial) == expected_html
@@ -131,8 +129,8 @@ class TestForm:
         form = ParamForm(request_data, param=my_param)
         the_param = form.as_param()
         expected_html = '<tr><th><label for="id_param_string">Param String:</label></th><td><input type="text"' \
-                        ' name="param_string" value="test string" class="form-control"' \
-                        ' required id="id_param_string"></td></tr>'
+                        ' name="param_string" value="test string" class="form-control" required' \
+                        ' id="id_param_string"><br><span class="helptext">Your String</span></td></tr>'
 
         # Check result
         assert the_param.inspect_value('param_string') == 'test string'
@@ -195,17 +193,6 @@ class TestForm:
         assert str(form) == expected_html
         assert the_param.inspect_value('dataset').values[0][0] == [5, 6]
         assert the_param.inspect_value('dataset').values[0][1] == [7, 8]
-        assert form.is_valid() is True
-
-    def test_param_list(self):
-        my_param = MyParamList()
-        request_data = QueryDict('', mutable=True)
-        request_data.update({'list': "10"})
-        form = ParamForm(request_data, param=my_param)
-        the_param = form.as_param()
-
-        # Check result
-        assert the_param.inspect_value('list') == [10]
         assert form.is_valid() is True
 
     def test_param_selector(self):
@@ -275,11 +262,11 @@ class TestForm:
     def test_tuples(self):
         my_param = MyParamTuple()
         request_data = QueryDict('', mutable=True)
-        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'True']})
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'False']})
         form = ParamForm(request_data, param=my_param)
         the_param = form.as_param()
         # Check result
-        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, True)
+        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, False)
         assert form.is_valid() is True
 
     def test_numerictuples(self):
