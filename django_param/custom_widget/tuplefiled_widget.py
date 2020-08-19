@@ -1,7 +1,7 @@
 from django import forms
 import pickle
 from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
-from django_param.utilities.helpers import remove_item_tuple, update_item_tuple, is_boolean
+from django_param.utilities.helpers import remove_item_tuple, update_item_tuple, is_checkbox
 
 
 class TupleFieldWidget(forms.widgets.MultiWidget):
@@ -71,30 +71,26 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         self.widgets = []
         # Update number of widgets
         try:
+            breakpoint()
             for i in range(len(value)):
                 # Find out if we should have the checkbox on or off
                 check_status = True
                 if isinstance(value[i], (float, int)):
-                    # Since bool inherits from int
-                    if isinstance(value[i], bool):
-                        self.widgets.append(CustomCheckboxInput(check_status=check_status))
-                    else:
-                        self.widgets.append(forms.NumberInput())
+                    self.widgets.append(forms.NumberInput())
                 else:
-                    # TODO: better delimeter (INSTEAD OF FALSE) so we can detect back to back BOOLEAN.
-                    if is_boolean(value[i]):
-                        if i < len(value) - 1:
-                            if is_boolean(value[i + 1]):
-                                value = update_item_tuple(value, i, True)
-                                value = remove_item_tuple(value, i + 1)
-                                check_status = True
-                            else:
-
-                                value = update_item_tuple(value, i, False)
-                                check_status = False
-                        else:
+                    if is_checkbox(value[i]):
+                        # there is no value in between, the check box is off
+                        if is_checkbox(value[i + 1]):
                             value = update_item_tuple(value, i, False)
+                            value = remove_item_tuple(value, i + 1)
                             check_status = False
+                        #
+                        else:
+                            value = update_item_tuple(value, i, True)
+                            value = remove_item_tuple(value, i + 1)
+                            value = remove_item_tuple(value, i + 1)
+                            check_status = True
+
                         self.widgets.append(CustomCheckboxInput(check_status=check_status))
                     else:
                         self.widgets.append(forms.TextInput())

@@ -3,7 +3,8 @@ import param
 from .widget_map import widget_map
 from pandas import DataFrame
 from datetime import datetime, date
-from django_param.utilities.helpers import clean_data, get_dataframe_name, remove_item_tuple, update_item_tuple
+from django_param.utilities.helpers import clean_data, get_dataframe_name, remove_item_tuple, update_item_tuple,\
+    is_checkbox
 
 
 class ParamForm(forms.Form):
@@ -98,20 +99,24 @@ class ParamForm(forms.Form):
                 value = datetime.strptime(date_time_str, date_time_format).date()
 
         if isinstance(self.param.params()[name], param.Boolean):
-            # in tuple with length 2 is True
-            if isinstance(value, tuple):
-                value = True if len(value) > 1 else False
-            else:
+            if is_checkbox(value[1]):
                 value = False
+            else:
+                value = True
 
         if isinstance(self.param.params()[name], param.Tuple):
             try:
                 for i in range(len(value)):
-                    if type(value[i]) == bool:
-                        if i < len(value) - 1:
-                            if type(value[i + 1]) == bool:
-                                value = update_item_tuple(value, i, True)
-                                value = remove_item_tuple(value, i + 1)
+                    if is_checkbox(value[i]):
+                        # there is no value in between, the check box is off
+                        if is_checkbox(value[i + 1]):
+                            value = update_item_tuple(value, i, False)
+                            value = remove_item_tuple(value, i + 1)
+                        #
+                        else:
+                            value = update_item_tuple(value, i, True)
+                            value = remove_item_tuple(value, i + 1)
+                            value = remove_item_tuple(value, i + 1)
             except IndexError:
                 pass
 

@@ -114,24 +114,24 @@ class TestForm:
     def test_param_boolean(self):
         my_param = MyParamBoolean()
         request_data = QueryDict('', mutable=True)
-        request_data.update({'boolean': 'False'})
+        request_data = QueryDict('boolean=__checkbox_begin__&boolean=True&boolean=__checkbox_end__', mutable=True)
         form = ParamForm(request_data, param=my_param)
-        the_param = form.as_param()
-
-        # Check result
-        assert the_param.inspect_value('boolean') is False
-        assert form.is_valid() is True
-
-    def test_param_boolean_true(self):
-        my_param = MyParamBoolean()
-        request_data = QueryDict('boolean=1&boolean=True&boolean=True', mutable=True)
-        form = ParamForm(request_data, param=my_param)
-        assert form.is_valid() is True
-
         the_param = form.as_param()
 
         # Check result
         assert the_param.inspect_value('boolean') is True
+        assert form.is_valid() is True
+
+    def test_param_boolean_False(self):
+        my_param = MyParamBoolean()
+        request_data = QueryDict('boolean=__checkbox_begin__&boolean=__checkbox_end__', mutable=True)
+        form = ParamForm(request_data, param=my_param)
+        assert form.is_valid() is True
+
+        the_param = form.as_param()
+
+        # Check result
+        assert the_param.inspect_value('boolean') is False
 
     def test_param_string(self):
         my_param = MyParamString()
@@ -273,7 +273,8 @@ class TestForm:
     def test_tuples_double(self):
         my_param = MyParamTuple()
         request_data = QueryDict('', mutable=True)
-        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'False', 'False']})
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', '__checkbox_begin__', 'False',
+                                           '__checkbox_end__']})
         form = ParamForm(request_data, param=my_param)
         the_param = form.as_param()
         # Check result
@@ -283,11 +284,12 @@ class TestForm:
     def test_tuples(self):
         my_param = MyParamTuple()
         request_data = QueryDict('', mutable=True)
-        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'True']})
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', '__checkbox_begin__',
+                                           '__checkbox_end__']})
         form = ParamForm(request_data, param=my_param)
         the_param = form.as_param()
         # Check result
-        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, True)
+        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, False)
         assert form.is_valid() is True
 
     def test_tuples_false(self):

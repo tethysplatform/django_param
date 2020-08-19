@@ -36,7 +36,14 @@ def is_number(s):
 
 
 def is_boolean(s):
-    if s.lower() in ['true', 'false']:
+    if str(s).lower() in ['true', 'false']:
+        return True
+    else:
+        return False
+
+
+def is_checkbox(s):
+    if str(s).lower() in ['__checkbox_end__', '__checkbox_begin__']:
         return True
     else:
         return False

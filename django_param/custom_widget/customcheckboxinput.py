@@ -1,4 +1,5 @@
 from django.forms.widgets import CheckboxInput
+from django_param.utilities.helpers import is_checkbox
 
 
 class CustomCheckboxInput(CheckboxInput):
@@ -18,7 +19,6 @@ class CustomCheckboxInput(CheckboxInput):
         context = super(CustomCheckboxInput, self).get_context(name, value, attrs)
         if context['widget']['attrs'] is None:
             context['widget']['attrs'] = {}
-        check_on = ""
         if self.check_status is not None:
             if self.check_status:
                 check_on = True
@@ -36,6 +36,10 @@ class CustomCheckboxInput(CheckboxInput):
         value = data.getlist(name)
         # If there are two more data then it's checked.
         if len(value) > 1:
-            return True
+            # ['__checkbox_begin__', '__checkbox_end__']
+            if is_checkbox(value[1]):
+                return False
+            else:
+                return True
         else:
             return False
