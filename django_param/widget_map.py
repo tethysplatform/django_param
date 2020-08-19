@@ -9,8 +9,7 @@
 import param
 from django import forms
 from django_select2.forms import Select2Widget, Select2MultipleWidget
-from django.forms.widgets import NumberInput, CheckboxInput, SelectMultiple, TextInput, Select,\
-    ClearableFileInput
+from django.forms.widgets import NumberInput, SelectMultiple, TextInput, Select
 from colorfield.fields import ColorWidget
 from django_param.custom_field.dataframe import DataFrameField
 from django_param.custom_field.tuplefield import TupleField, NumericTupleField, XYTupleField, RangeTupleField

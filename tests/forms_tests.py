@@ -30,7 +30,7 @@ class MyParamColor(param.Parameterized):
 
 
 class MyParamSelector(param.Parameterized):
-    selector = param.Selector(objects=["red", "yellow", "green", "blue"])
+    selector = param.Selector(default='red', objects=["red", "yellow", "green", "blue"])
 
 
 class MyParamListSelector(param.Parameterized):
@@ -67,7 +67,7 @@ class MyParamRange(param.Parameterized):
 
 
 class MyParamTuple(param.Parameterized):
-    my_tuples = param.Tuple(default=("test", 50, 'Aquaveo', 100, "Hello", True), allow_None=True)
+    my_tuples = param.Tuple(default=("test", 50, 'Aquaveo', 100, "Hello", False), allow_None=True)
 
 
 class MyParamNumericTuple(param.Parameterized):
@@ -121,6 +121,17 @@ class TestForm:
         # Check result
         assert the_param.inspect_value('boolean') is False
         assert form.is_valid() is True
+
+    def test_param_boolean_true(self):
+        my_param = MyParamBoolean()
+        request_data = QueryDict('boolean=1&boolean=True&boolean=True', mutable=True)
+        form = ParamForm(request_data, param=my_param)
+        assert form.is_valid() is True
+
+        the_param = form.as_param()
+
+        # Check result
+        assert the_param.inspect_value('boolean') is True
 
     def test_param_string(self):
         my_param = MyParamString()
@@ -259,14 +270,34 @@ class TestForm:
         assert the_param.inspect_value('my_ranges') == (-100, 100)
         assert form.is_valid() is True
 
-    def test_tuples(self):
+    def test_tuples_double(self):
         my_param = MyParamTuple()
         request_data = QueryDict('', mutable=True)
-        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'False']})
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'False', 'False']})
         form = ParamForm(request_data, param=my_param)
         the_param = form.as_param()
         # Check result
-        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, False)
+        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, True)
+        assert form.is_valid() is True
+
+    def test_tuples(self):
+        my_param = MyParamTuple()
+        request_data = QueryDict('', mutable=True)
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', '1', 'True']})
+        form = ParamForm(request_data, param=my_param)
+        the_param = form.as_param()
+        # Check result
+        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', 1, True)
+        assert form.is_valid() is True
+
+    def test_tuples_false(self):
+        my_param = MyParamTuple()
+        request_data = QueryDict('', mutable=True)
+        request_data.update({'my_tuples': ['-100', '100', 'Aquaveo', 'Test', 'False', '1']})
+        form = ParamForm(request_data, param=my_param)
+        the_param = form.as_param()
+        # Check result
+        assert the_param.inspect_value('my_tuples') == (-100, 100, 'Aquaveo', 'Test', False, 1)
         assert form.is_valid() is True
 
     def test_numerictuples(self):

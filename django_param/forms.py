@@ -3,6 +3,7 @@ import param
 from .widget_map import widget_map
 from pandas import DataFrame
 from datetime import datetime, date
+from django_param.utilities.helpers import clean_data, get_dataframe_name, remove_item_tuple, update_item_tuple
 
 
 class ParamForm(forms.Form):
@@ -79,11 +80,12 @@ class ParamForm(forms.Form):
             value = clean_data(value_temp, is_dict=is_dict)
         else:
             value = clean_data(data.get(name), is_dict=is_dict)
-        # Selector only take one value, not list.
-        if isinstance(self.param.params()[name], (param.Selector, param.FileSelector, param.ObjectSelector))\
-                and not isinstance(self.param.params()[name], param.ObjectSelector):
-            if isinstance(value, list) and len(value) == 1:
-                value = value[0]
+
+        # # Selector only take one value, not list.
+        # if isinstance(self.param.params()[name], (param.Selector, param.FileSelector, param.ObjectSelector))\
+        #         and not isinstance(self.param.params()[name], param.ObjectSelector):
+        #     if isinstance(value, list) and len(value) == 1:
+        #         value = value[0]
 
         # Convert to datetime object if neccessary
         if isinstance(self.param.inspect_value(name), (date, datetime)):
@@ -103,13 +105,16 @@ class ParamForm(forms.Form):
                 value = False
 
         if isinstance(self.param.params()[name], param.Tuple):
-            if isinstance(value, tuple):
-                # value (False, False) is True.
-                if len(value) == 2:
-                    if type(value[0]) == bool and type(value[1]) == bool:
-                        value = (True, )
-            elif type(value) == bool:
-                value = (value, )
+            try:
+                for i in range(len(value)):
+                    if type(value[i]) == bool:
+                        if i < len(value) - 1:
+                            if type(value[i + 1]) == bool:
+                                value = update_item_tuple(value, i, True)
+                                value = remove_item_tuple(value, i + 1)
+            except IndexError:
+                pass
+
         try:
             # Update param
             self.param.set_param(name, value)
@@ -170,51 +175,3 @@ class ParamForm(forms.Form):
             if self.initial:
                 self._set_and_validate_data(self.initial)
                 return
-
-
-def clean_data(in_data, is_dict=False):
-    if isinstance(in_data, (list, tuple)):
-        out_data = []
-        for data in in_data:
-            out_data.append(convert_string(data))
-        if not is_dict:
-            out_data = tuple(out_data)
-    else:
-        out_data = convert_string(in_data)
-        if is_dict:
-            temp_data = list()
-            temp_data.append(out_data)
-            out_data = temp_data
-    return out_data
-
-
-def convert_string(data):
-    if is_number(data):
-        if "." in data:
-            data = float(data)
-        else:
-            data = int(data)
-    if data == 'True' or data == 'on':
-        data = True
-    if data == 'False':
-        data = False
-    return data
-
-
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def get_dataframe_name(s):
-    # Return list with variable_name, and dataframe_name if the type is dataframe.
-    if s[-2:] == "__":
-        s = s[:-2]
-        dataframe_name = s.split("___")[-1]
-        variable_name = s.split("___")[0]
-        return variable_name, dataframe_name
-    else:
-        return False

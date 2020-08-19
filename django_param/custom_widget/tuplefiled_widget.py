@@ -1,6 +1,7 @@
 from django import forms
 import pickle
 from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
+from django_param.utilities.helpers import remove_item_tuple, update_item_tuple, is_boolean
 
 
 class TupleFieldWidget(forms.widgets.MultiWidget):
@@ -69,31 +70,36 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
-        skip_iter = False
-        for i in range(len(value)):
-            if skip_iter:
-                skip_iter = False
-                continue
-
-            # Find out if we should have the checkbox on or off
-            check_status = True
-            if isinstance(value[i], (float, int)):
-                # Since bool inherits from int
-                if isinstance(value[i], bool):
-                    self.widgets.append(CustomCheckboxInput(check_status=check_status))
-                else:
-                    self.widgets.append(forms.NumberInput())
-            else:
-                if bool(value[i]):
-                    if i < len(value) - 1:
-                        if bool(value[i + 1]):
-                            skip_iter = True
+        try:
+            for i in range(len(value)):
+                # Find out if we should have the checkbox on or off
+                check_status = True
+                if isinstance(value[i], (float, int)):
+                    # Since bool inherits from int
+                    if isinstance(value[i], bool):
+                        self.widgets.append(CustomCheckboxInput(check_status=check_status))
                     else:
-                        check_status = False
-                    self.widgets.append(CustomCheckboxInput(check_status=check_status))
-
+                        self.widgets.append(forms.NumberInput())
                 else:
-                    self.widgets.append(forms.TextInput())
+                    # TODO: better delimeter (INSTEAD OF FALSE) so we can detect back to back BOOLEAN.
+                    if is_boolean(value[i]):
+                        if i < len(value) - 1:
+                            if is_boolean(value[i + 1]):
+                                value = update_item_tuple(value, i, True)
+                                value = remove_item_tuple(value, i + 1)
+                                check_status = True
+                            else:
+
+                                value = update_item_tuple(value, i, False)
+                                check_status = False
+                        else:
+                            value = update_item_tuple(value, i, False)
+                            check_status = False
+                        self.widgets.append(CustomCheckboxInput(check_status=check_status))
+                    else:
+                        self.widgets.append(forms.TextInput())
+        except IndexError:
+            pass
 
         context = self.custom_get_context(name, value, attrs, context)
         return context

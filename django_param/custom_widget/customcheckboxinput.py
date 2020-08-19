@@ -1,5 +1,3 @@
-from django import forms
-import pandas as pd
 from django.forms.widgets import CheckboxInput
 
 
