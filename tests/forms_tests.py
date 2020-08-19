@@ -122,7 +122,7 @@ class TestForm:
         assert the_param.inspect_value('boolean') is True
         assert form.is_valid() is True
 
-    def test_param_boolean_False(self):
+    def test_param_boolean_false(self):
         my_param = MyParamBoolean()
         request_data = QueryDict('boolean=__checkbox_begin__&boolean=__checkbox_end__', mutable=True)
         form = ParamForm(request_data, param=my_param)
