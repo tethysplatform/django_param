@@ -4,3 +4,4 @@ include *.rst
 prune .coverage
 prune .github
 prune .stickler.yml
+include LICENSE
