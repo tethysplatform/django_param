@@ -71,7 +71,6 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         self.widgets = []
         # Update number of widgets
         try:
-            breakpoint()
             for i in range(len(value)):
                 # Find out if we should have the checkbox on or off
                 check_status = True
