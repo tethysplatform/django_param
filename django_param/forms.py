@@ -1,3 +1,6 @@
+"""
+Custom Django Form that can be defined using a param.Parameterized object.
+"""
 from datetime import date, datetime
 
 from django import forms
@@ -6,17 +9,44 @@ import param
 
 from django_param.utilities.helpers import clean_data, get_dataframe_name, is_checkbox, remove_item_tuple, \
     update_item_tuple
-from django_param.widget_map import widget_map
+from django_param.widget_map import widget_map as default_widget_map
 
 
 class ParamForm(forms.Form):
+    """
+    Custom Django Form that can be defined using a param.Parameterized object.
+    """
     _param = None
     read_only = None
     _error_key_list = []
     cleaned_data = ""
-    widget_map = widget_map
+    _widget_map = default_widget_map
+
+    @property
+    def param(self):
+        """
+        Getter for underlying param.Parameter object.
+        """
+        return self._param
+
+    @property
+    def widget(self):
+        """
+        Getter for underlying dictionary used to map param.Parameters to Django Fields/Widgets.
+        """
+        return self._widget_map
 
     def __init__(self, *args, **kwargs):
+        """
+        Constructor.
+
+        Args:
+            param (param.Parameterized): The Parameterized object to use to define the form.
+            read_only (bool): Render form as read-only (not editable).
+            widget_map (dict): A dictionary containing custom mapping(s) of param.Parameters to Django Fields/Widgets.
+            *args: See https://docs.djangoproject.com/en/2.2/ref/forms/api/#django.forms.Form.
+            **kwargs: See https://docs.djangoproject.com/en/2.2/ref/forms/api/#django.forms.Form.
+        """
         param_class = kwargs.pop('param', None)
         if param_class is None:
             raise KeyError('Keyword argument param is required.')
@@ -30,25 +60,22 @@ class ParamForm(forms.Form):
 
         custom_widget_map = kwargs.pop('widget_map', None)
         if custom_widget_map:
-            self.widget_map = custom_widget_map
+            self._widget_map = custom_widget_map
         super().__init__(*args, **kwargs)
         self._generate_form_fields()
 
-    @property
-    def param(self):
-        return self._param
-
-    @property
-    def widget(self):
-        return self.widget_map
-
     def _add_error(self, key, message):
-        # Only add error once for each parameter to avoid duplicate
+        """
+        Only add error once for each parameter to avoid duplicate.
+        """
         if key not in self._error_key_list:
             self._error_key_list.append(key)
             self.add_error(key, str(message))
 
     def _set_and_validate_data(self, data):
+        """
+        Custom validation method.
+        """
         # To handle dataframe case
         dataframe_key_list = []
 
@@ -63,6 +90,9 @@ class ParamForm(forms.Form):
             self._set_and_validate_dataframe(data, dataframe_key_list, dataframe_name)
 
     def _set_and_validate_dataframe(self, data, data_list, dataframe_name):
+        """
+        Custom validation method.
+        """
         # Handle Dataframe case
         data_dict = {}
         for key in data_list:
@@ -72,6 +102,9 @@ class ParamForm(forms.Form):
         self.param.set_param(dataframe_name, value)
 
     def _set_and_validate_data_name(self, data, name):
+        """
+        Custom validation method.
+        """
         # Find out if it is dataframe
         is_dict = False
         if isinstance(self.param.params()[name], (param.List, param.ListSelector)):
@@ -83,12 +116,6 @@ class ParamForm(forms.Form):
             value = clean_data(value_temp, is_dict=is_dict)
         else:
             value = clean_data(data.get(name), is_dict=is_dict)
-
-        # # Selector only take one value, not list.
-        # if isinstance(self.param.params()[name], (param.Selector, param.FileSelector, param.ObjectSelector))\
-        #         and not isinstance(self.param.params()[name], param.ObjectSelector):
-        #     if isinstance(value, list) and len(value) == 1:
-        #         value = value[0]
 
         # Convert to datetime object if neccessary
         if isinstance(self.param.inspect_value(name), (date, datetime)):
@@ -164,10 +191,16 @@ class ParamForm(forms.Form):
         # self.fields = self.base_fields
 
     def as_param(self):
+        """
+        Clean form and return underlying param.Parameterized object.
+        """
         self._clean()
         return self.param
 
     def _clean(self):
+        """
+        Custom clean method called only when retrieving the param object.
+        """
         self.cleaned_data = super().clean()
         # Use bound data to set the value if we both have bound and initial data.
         if self.is_bound and self.initial:
