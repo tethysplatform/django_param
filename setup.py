@@ -15,7 +15,7 @@ setup(
     version='0.1.10',
     description='Django Param provides the ParamForm class which translates a param class into a native Django Form.',
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     keywords='',
     author='htran',
     author_email='htran@aquaveo.com',
