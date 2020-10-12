@@ -16,10 +16,10 @@ class ParamForm(forms.Form):
     """
     Custom Django Form that can be defined using a param.Parameterized object.
     """
-    _param = None
     read_only = None
-    _error_key_list = []
     cleaned_data = ""
+    _param = None
+    _error_key_list = []
     _widget_map = default_widget_map
 
     @property
@@ -30,7 +30,7 @@ class ParamForm(forms.Form):
         return self._param
 
     @property
-    def widget(self):
+    def widget_map(self):
         """
         Getter for underlying dictionary used to map param.Parameters to Django Fields/Widgets.
         """
@@ -177,7 +177,7 @@ class ParamForm(forms.Form):
             if isinstance(self.param.params()[p_name], (param.FileSelector, param.MultiFileSelector)):
                 p.default = ""
 
-            self.fields[p_name] = self.widget[type(p)](self.param, p, p.name)
+            self.fields[p_name] = self.widget_map[type(p)](self.param, p, p.name)
             self.fields[p_name].label = p.name.replace("_", " ").title()
             if self.read_only is None:
                 widget_attribute = {'class': 'form-control'}
