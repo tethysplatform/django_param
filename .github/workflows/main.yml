@@ -1,0 +1,67 @@
+name: Lint and Test
+
+on: [push, pull_request]
+
+jobs:
+  # The Flake8 Job
+  flake:
+    name: Lint with Flake
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.8]
+
+    steps:
+      # Checkout Sources
+      - uses: actions/checkout@v2
+      # Setup Python
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      # Install Dependencies
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 flake8-docstrings flake8-bugbear flake8-import-order pep8-naming flake8-colors
+      # Run Flake
+      - name: Run Flake8
+        run: flake8 .
+        shell: bash
+
+  # The Test Job
+  test:
+    name: Test ${{ matrix.python-version }}
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --trusted-host pypi.python.org --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements_test.txt
+    - name: Run Tests on ${{ matrix.python-version }} on ${{ matrix.platform }}
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: |
+        find -name '*.pyc' -delete
+        find -name __pycache__ -delete
+        export DJANGO_SETTINGS_MODULE="settings"
+        python setup.py develop
+        pytest --cov=. --cov-config=coverage.ini
+        coveralls --rcfile=coverage.ini

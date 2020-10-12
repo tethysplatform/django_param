@@ -1,15 +1,32 @@
-from django import forms
+"""
+Custom Django Widgets for param.Tuple derived Parameters.
+"""
 import pickle
+
+from django import forms
+
 from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
-from django_param.utilities.helpers import remove_item_tuple, update_item_tuple, is_checkbox
+from django_param.utilities.helpers import is_checkbox, remove_item_tuple, update_item_tuple
 
 
 class TupleFieldWidget(forms.widgets.MultiWidget):
+    """
+    Custom Django Widget for param.Tuple Parameters.
+    """
     def __init__(self, attrs=None):
+        """
+        Constructor.
+
+        Args:
+            attrs: See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#widget
+        """
         widgets = [forms.TextInput()]
         super(TupleFieldWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
+        """
+        See: https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.MultiWidget.decompress.
+        """
         if not isinstance(value, tuple):
             if value:
                 return pickle.loads(value)
@@ -19,6 +36,9 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
             return value
 
     def custom_get_context(self, name, value, attrs, context, **kwargs):
+        """
+        Extension of get_context.
+        """
         xy = kwargs.get('xy', False)
         range_option = kwargs.get('range_option', False)
         if self.is_localized:
@@ -67,6 +87,9 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         return context
 
     def get_context(self, name, value, attrs):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.get_context.
+        """
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
@@ -100,17 +123,26 @@ class TupleFieldWidget(forms.widgets.MultiWidget):
         return context
 
     def value_from_datadict(self, data, files, name):
+        """
+        See: https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.value_from_datadict.
+        """
         # Override this method since we use one name for all the widgets.
         values = data.getlist(name)
         return values
 
 
 class NumericTupleFieldWidget(TupleFieldWidget):
+    """
+    Custom Django Widget for param.NumericTuple Parameters.
+    """
     def get_context(self, name, value, attrs):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.get_context.
+        """
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
-        for i in range(len(value)):
+        for _ in range(len(value)):
             self.widgets.append(forms.NumberInput())
 
         context = self.custom_get_context(name, value, attrs, context)
@@ -118,11 +150,17 @@ class NumericTupleFieldWidget(TupleFieldWidget):
 
 
 class XYTupleFieldWidget(TupleFieldWidget):
+    """
+    Custom Django Widget for param.XYCoordinates Parameters.
+    """
     def get_context(self, name, value, attrs):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.get_context.
+        """
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
-        for i in range(2):
+        for _ in range(2):
             self.widgets.append(XYNumberInput())
 
         context = self.custom_get_context(name, value, attrs, context, xy=True)
@@ -130,11 +168,17 @@ class XYTupleFieldWidget(TupleFieldWidget):
 
 
 class RangeTupleFieldWidget(TupleFieldWidget):
+    """
+    Custom Django Widget for param.Range Parameters.
+    """
     def get_context(self, name, value, attrs):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.get_context.
+        """
         context = forms.Widget.get_context(self, name, value, attrs)
         self.widgets = []
         # Update number of widgets
-        for i in range(2):
+        for _ in range(2):
             self.widgets.append(XYNumberInput())
 
         context = self.custom_get_context(name, value, attrs, context, range_option=True)
@@ -142,5 +186,8 @@ class RangeTupleFieldWidget(TupleFieldWidget):
 
 
 class XYNumberInput(forms.NumberInput):
+    """
+    Custom Django Widget for a pair of Number inputs.
+    """
     # Template works for both range and xy coordinates
     template_name = 'django_param/tuplefield/xytuplefield.html'

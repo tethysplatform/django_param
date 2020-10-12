@@ -1,23 +1,19 @@
 """
-********************************************************************************
-* Name: param_widgets.py
-* Author: Scott Christensen and Nathan Swain
-* Created On: January 18, 2019
-* Copyright: (c) Aquaveo 2019
-********************************************************************************
+Map of Param Parameters to Django Form Fields and Widgets.
 """
-import param
-from django import forms
-from django_select2.forms import Select2Widget, Select2MultipleWidget
-from django.forms.widgets import NumberInput, SelectMultiple, TextInput, Select
 from colorfield.fields import ColorWidget
+from django import forms
+from django.forms.widgets import NumberInput, Select, SelectMultiple, TextInput
+from django_select2.forms import Select2MultipleWidget, Select2Widget
+import param
+
 from django_param.custom_field.dataframe import DataFrameField
-from django_param.custom_field.tuplefield import TupleField, NumericTupleField, XYTupleField, RangeTupleField
+from django_param.custom_field.tuplefield import NumericTupleField, RangeTupleField, TupleField, XYTupleField
+from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
 from django_param.custom_widget.dataframewidget import DataFrameWidget
 from django_param.custom_widget.datepicker_widget import DatePickerWidget
-from django_param.custom_widget.tuplefiled_widget import TupleFieldWidget, NumericTupleFieldWidget, XYTupleFieldWidget,\
-    RangeTupleFieldWidget
-from django_param.custom_widget.customcheckboxinput import CustomCheckboxInput
+from django_param.custom_widget.tuplefield_widget import NumericTupleFieldWidget, RangeTupleFieldWidget, \
+    TupleFieldWidget, XYTupleFieldWidget
 
 
 widget_map = {

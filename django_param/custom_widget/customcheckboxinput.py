@@ -1,21 +1,40 @@
+"""
+Custom Checkbox Input Widget.
+"""
 from django.forms.widgets import CheckboxInput
+
 from django_param.utilities.helpers import is_checkbox
 
 
 class CustomCheckboxInput(CheckboxInput):
+    """
+    Custom Checkbox Input Widget.
+    """
     template_name = 'django_param/customcheckboxinput/customcheckboxinput_widget.html'
     check_status = None
 
     def __init__(self, attrs=None, check_status=None):
+        """
+        Constructor.
+
+        Args:
+            attrs: See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.attrs.
+            check_status: The default status of the checkbox. If True, the checkbox will be checked. Defaults to None.
+        """
         # check_status to control the on/off default status of the checkbox.
         self.check_status = check_status
         super(CustomCheckboxInput, self).__init__(attrs)
 
     def format_value(self, value):
-        """Only return the 'value' attribute if value isn't empty."""
+        """
+        Only return the 'value' attribute if value isn't empty.
+        """
         return str(value)
 
     def get_context(self, name, value, attrs):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.get_context.
+        """
         context = super(CustomCheckboxInput, self).get_context(name, value, attrs)
         if context['widget']['attrs'] is None:
             context['widget']['attrs'] = {}
@@ -33,6 +52,9 @@ class CustomCheckboxInput(CheckboxInput):
         return context
 
     def value_from_datadict(self, data, files, name):
+        """
+        See https://docs.djangoproject.com/en/2.2/ref/forms/widgets/#django.forms.Widget.value_from_datadict.
+        """
         value = data.getlist(name)
         # If there are two more data then it's checked.
         if len(value) > 1:
