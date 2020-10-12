@@ -7,13 +7,13 @@ with open('requirements.txt') as f:
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='django_param',
-    version='0.1.9',
-    description='django_param provides ParamForm class which allows python param to be used in django form.',
+    version='0.1.10',
+    description='Django Param provides the ParamForm class which translates a param class into a native Django Form.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     keywords='',
