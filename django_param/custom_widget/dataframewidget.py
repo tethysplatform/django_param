@@ -37,10 +37,10 @@ class DataFrameWidget(forms.Widget):
 
     def value_from_datadict(self, data, files, name):
         """
-        convert values into dataframe object.
+        Convert values into dataframe object.
         """
         data_dict = {}
-        for key, value in data.items():
+        for key in data.keys():
             if key[-2:] == "__":
                 data_dict[key.replace("___" + name + "__", "")] = data.getlist(key)
         dataframe = pd.DataFrame.from_dict(data_dict)

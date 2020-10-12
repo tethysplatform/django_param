@@ -1,4 +1,5 @@
 from django.forms.widgets import CheckboxInput
+
 from django_param.utilities.helpers import is_checkbox
 
 

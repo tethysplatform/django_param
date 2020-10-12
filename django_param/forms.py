@@ -1,10 +1,12 @@
+from datetime import date, datetime
+
 from django import forms
-import param
-from .widget_map import widget_map
 from pandas import DataFrame
-from datetime import datetime, date
-from django_param.utilities.helpers import clean_data, get_dataframe_name, remove_item_tuple, update_item_tuple,\
-    is_checkbox
+import param
+
+from django_param.utilities.helpers import clean_data, get_dataframe_name, is_checkbox, remove_item_tuple, \
+    update_item_tuple
+from django_param.widget_map import widget_map
 
 
 class ParamForm(forms.Form):
@@ -50,7 +52,7 @@ class ParamForm(forms.Form):
         # To handle dataframe case
         dataframe_key_list = []
 
-        for key, value in data.items():
+        for key in data.keys():
             if key != 'csrfmiddlewaretoken':
                 if get_dataframe_name(key):
                     variable_name, dataframe_name = get_dataframe_name(key)

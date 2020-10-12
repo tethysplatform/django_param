@@ -1,10 +1,6 @@
 from setuptools import setup, find_namespace_packages
 from os import path
 
-# -- Apps Definition -- #
-app_package = 'django_param'
-release_package = app_package
-
 # -- Python Dependencies -- #
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -15,7 +11,7 @@ with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name=release_package,
+    name='django_param',
     version='0.1.9',
     description='django_param provides ParamForm class which allows python param to be used in django form.',
     long_description=long_description,

@@ -1,5 +1,6 @@
+from datetime import date, datetime
+
 from django import forms
-from datetime import datetime, date
 
 
 class DatePickerWidget(forms.Widget):
@@ -25,7 +26,7 @@ class DatePickerWidget(forms.Widget):
 
     def value_from_datadict(self, data, files, name):
         """
-        convert values into datetimeobject again.
+        Convert values into datetimeobject again.
         """
         date_time_str = data[name]
         if ":" in date_time_str:
@@ -37,7 +38,9 @@ class DatePickerWidget(forms.Widget):
         return date_time_obj
 
     def format_value(self, value):
-        # Convert to datetime to right string to display on the html.
+        """
+        Convert to datetime to right string to display on the html.
+        """
         if isinstance(value, datetime):
             date_time_format = '%m-%d-%Y %H:%M'
             value = value.strftime(date_time_format)
